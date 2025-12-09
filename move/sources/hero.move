@@ -29,8 +29,10 @@ public fun create_hero(name: String, image_url: String, power: u64, ctx: &mut Tx
         image_url,
         power,
     };
+
     // TODO: Transfer the hero to the transaction sender
     transfer::public_transfer(hero, ctx.sender());
+
     // TODO: Create HeroMetadata and freeze it for tracking
         // Hints:
         // Use ctx.epoch_timestamp_ms() for timestamp
@@ -38,6 +40,7 @@ public fun create_hero(name: String, image_url: String, power: u64, ctx: &mut Tx
         id: object::new(ctx),
         timestamp: ctx.epoch_timestamp_ms(),
     };
+    
     //TODO: Use transfer::freeze_object() to make metadata immutable
     transfer::freeze_object(hero_metadata)
 }

@@ -51,6 +51,7 @@ fun init(ctx: &mut TxContext) {
     let admin_cap = AdminCap{
         id: object::new(ctx),
     };
+
     // TODO: Transfer it to the module publisher (ctx.sender()) using transfer::public_transfer() function
     transfer::public_transfer(admin_cap, ctx.sender())
 }
@@ -66,6 +67,7 @@ public fun list_hero(nft: Hero, price: u64, ctx: &mut TxContext) {
         price,
         seller: ctx.sender(),
     };
+
     // TODO: Emit HeroListed event with listing details (Don't forget to use object::id(&list_hero) )
     event::emit(HeroListed{
         list_hero_id: object::id(&list_hero),
@@ -73,6 +75,7 @@ public fun list_hero(nft: Hero, price: u64, ctx: &mut TxContext) {
         seller: ctx.sender(),
         timestamp: ctx.epoch_timestamp_ms()
     });
+
     // TODO: Use transfer::share_object() to make it publicly tradeable
     transfer::share_object(list_hero);
 }
@@ -83,12 +86,16 @@ public fun buy_hero(list_hero: ListHero, coin: Coin<SUI>, ctx: &mut TxContext) {
         // Hints:
         // let ListHero { id, nft, price, seller } = list_hero;
     let ListHero {id, nft, price, seller} = list_hero;
+
     // TODO: Use assert! to verify coin value equals listing price (coin::value(&coin) == price) else abort with `EInvalidPayment`
-    assert!(coin::value(&coin) != price, EInvalidPayment);
+    assert!(coin::value(&coin) == price, EInvalidPayment);
+
     // TODO: Transfer coin to seller (use transfer::public_transfer() function)
     transfer::public_transfer(coin, seller);
+
     // TODO: Transfer hero NFT to buyer (ctx.sender())
     transfer::public_transfer(nft, ctx.sender());
+
     // TODO: Emit HeroBought event with transaction details (Don't forget to use object::uid_to_inner(&id) )
     event::emit(HeroBought{
         list_hero_id: object::uid_to_inner(&id),
@@ -97,6 +104,7 @@ public fun buy_hero(list_hero: ListHero, coin: Coin<SUI>, ctx: &mut TxContext) {
         seller,
         timestamp: ctx.epoch_timestamp_ms(),
     });
+
     // TODO: Delete the listing ID (object::delete(id))
     object::delete(id);
 }
@@ -109,14 +117,15 @@ public fun delist(_: &AdminCap, list_hero: ListHero) {
         // Hints:
         // Destructure list_hero (ignore price with "price: _")
     let ListHero {id, nft, price: _, seller} = list_hero;
+
     // TODO:Transfer NFT back to original seller
     transfer::public_transfer(nft, seller);
+
     // TODO:Delete the listing ID (object::delete(id))
     object::delete(id)
 }
 
 public fun change_the_price(_: &AdminCap, list_hero: &mut ListHero, new_price: u64) {
-    
     // NOTE: The AdminCap parameter ensures only admin can call this
     // list_hero has &mut so price can be modified     
     // TODO: Update the listing price
