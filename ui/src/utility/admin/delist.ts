@@ -6,7 +6,6 @@ export const delist = (
   adminCapId: string,
 ) => {
   const tx = new Transaction();
-
   // TODO: Add moveCall to delist a hero (Admin only)
   // Function: `${packageId}::marketplace::delist`
   // Arguments: adminCapId (object), listHeroId (object)
@@ -14,6 +13,9 @@ export const delist = (
     // Use tx.object() for both objects
     // This requires admin capability verification
     // Returns the hero to the original seller
-
+  tx.moveCall({
+    target: `${packageId}::marketplace::delist`,
+    arguments: [tx.object(adminCapId), tx.object(listHeroId)],
+  });
   return tx;
 };
